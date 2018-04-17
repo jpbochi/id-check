@@ -4,14 +4,12 @@ set -eu
 # some inspiration from https://raymii.org/s/tutorials/Sign_and_verify_text_files_to_public_keys_via_the_OpenSSL_Command_Line.html
 
 MESSAGE=$1
-# ID_FILE=$(ssh -vT git@github.com 2>&1 | grep 'Offering RSA public key' | tail -n1 | cut -d' ' -f6 | tr -d '\r')
 ID_FILE=$(ssh -G git@github.com | grep identityfile | cut -d' ' -f2 | xargs -I % sh -c 'test -r % && echo % || true' | head)
-# ID_FILE=/root/.ssh/id_rsa
-# ID_FILE=~/.ssh/id_rsa
 
 echo >&2 '>>> signing with this identity file:' $ID_FILE
-printf $MESSAGE
-printf ' '
+
 set -o pipefail
-printf $MESSAGE | openssl dgst -sha256 -sign $ID_FILE | base64 | tr -d '\n'
-echo
+SIGNATURE=$(printf $MESSAGE | openssl dgst -sha256 -sign $ID_FILE | base64 | tr -d '\n')
+
+ESCAPED_MESSAGE=$(printf $MESSAGE | sed 's/"/\\"/g')
+echo '{"message":"'$ESCAPED_MESSAGE'","signature":"'$SIGNATURE'"}'

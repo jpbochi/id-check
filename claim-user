@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 set -eu
 
-USER=${1:-jpbochi}
+USER=${1:-$GITHUB_USER}
 NOW=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 MESSAGE='{"time":"'$NOW'","user":"'$USER'"}'
 

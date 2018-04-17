@@ -74,17 +74,18 @@ const getKeys = (message) => {
   }
 };
 
-const messagePayload = _.get(process.argv, 2);
-const signature = _.trim(_.get(process.argv, 3));
-
-const message = JSON.parse(messagePayload);
+const rawPayload = _.get(process.argv, 2);
+const jsonPayload = JSON.parse(rawPayload);
+const rawMessage = jsonPayload.message;
+const message = JSON.parse(jsonPayload.message);
+const { signature } = jsonPayload;
 
 console.info('>>> claim to verify:', { message, signature }, '<<<');
 
 return getKeys(message)
   .then(keys => {
     console.log('> verifying message signature against GitHub keys...');
-    const goodKey = _.find(keys, key => verify(messagePayload, key, signature));
+    const goodKey = _.find(keys, key => verify(rawMessage, key, signature));
     if (goodKey) {
       console.log('> signature looks good. I trust you.')
     } else {

@@ -1,2 +1,2 @@
 
-try `node ./index.js $(./claim whatever_your_github_username_is)`
+try `node ./verify.js $(./claim-user ${GITHUB_USER})`
