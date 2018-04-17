@@ -6,9 +6,11 @@ set -eu
 USER=${1:-jpbochi}
 NOW=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 MESSAGE='{"time":"'$NOW'","user":"'$USER'"}'
-# ID_FILE=$(ssh -vT git@github.com 2>&1 | grep 'Offering RSA public key' | tail -n1 | cut -d' ' -f6 | tr -d '\n' | tr -d '\r')
-ID_FILE=~/.ssh/id_rsa
+ID_FILE=$(ssh -vT git@github.com 2>&1 | grep 'Offering RSA public key' | tail -n1 | cut -d' ' -f6 | tr -d '\r')
+# ID_FILE=~/.ssh/id_rsa
 
+echo >&2 '>>> using this identity file:' $ID_FILE
 printf $MESSAGE
 printf ' '
+set -o pipefail
 printf $MESSAGE | openssl dgst -sha256 -sign $ID_FILE | base64
