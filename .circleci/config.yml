@@ -8,5 +8,4 @@ jobs:
     steps:
       - checkout
       - run: apk add --no-cache --update openssl
-      - run: ssh -vT git@github.com || echo meh
       - run: ./claim
