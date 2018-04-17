@@ -1,6 +1,8 @@
 #!/usr/bin/env sh
 set -eu
 
+# some inspiration from https://raymii.org/s/tutorials/Sign_and_verify_text_files_to_public_keys_via_the_OpenSSL_Command_Line.html
+
 USER=${1:-jpbochi}
 NOW=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 MESSAGE='{"time":"'$NOW'","user":"'$USER'"}'
