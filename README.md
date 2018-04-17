@@ -1,2 +1,2 @@
 
-try `node ./verify.js $(./claim-user ${GITHUB_USER})`
+try `./claim-user ${GITHUB_USER} | node ./verify.js`

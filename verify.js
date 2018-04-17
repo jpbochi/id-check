@@ -74,7 +74,7 @@ const getKeys = (message) => {
   }
 };
 
-const rawPayload = _.get(process.argv, 2);
+const rawPayload = fs.readFileSync('/dev/stdin').toString();
 const jsonPayload = JSON.parse(rawPayload);
 const rawMessage = jsonPayload.message;
 const message = JSON.parse(jsonPayload.message);
