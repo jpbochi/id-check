@@ -7,5 +7,5 @@ jobs:
     working_directory: ~/repo
     steps:
       - checkout
-      - run: apk add --no-cache --update openssl
-      - run: ./claim
+      - run: apk add --no-cache --update openssl perl
+      - run: ./claim-repo-deploy-key

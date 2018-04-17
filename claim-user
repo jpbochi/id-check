@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+set -eu
+
+USER=${1:-jpbochi}
+NOW=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+MESSAGE='{"time":"'$NOW'","user":"'$USER'"}'
+
+./sign $MESSAGE

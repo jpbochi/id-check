@@ -40,7 +40,7 @@ const handleResponseIfNotOk = (res) => {
   return res;
 };
 
-const getGitHubKeys = (user) => (
+const getGitHubUserKeys = (user) => (
   fetch(`https://api.github.com/users/${user}/keys`)
     .then(handleResponseIfNotOk)
     .then(_.method('json'))
@@ -50,22 +50,45 @@ const getGitHubKeys = (user) => (
     ))
 );
 
+const getGitHubDeployKeys = (repo) => {
+  const githubUsername = process.env.GITHUB_USER;
+  const githubToken = process.env.GITHUB_TOKEN;
+  const basicAuth = Buffer.from(`${githubUsername}:${githubToken}`).toString('base64');
+  return fetch(`https://api.github.com/repos/${repo}/keys`, { headers: { Authorization: `Basic ${basicAuth}` }})
+    .then(handleResponseIfNotOk)
+    .then(_.method('json'))
+    .then(ghKeys => _.map(ghKeys, _.property('key')))
+    .then(sshKeys => (
+      _.map(sshKeys, sshKey => sshpk.parseKey(sshKey).toString('pkcs1'))
+    ))
+};
+
+const getKeys = (message) => {
+  const { user, repo, time } = message;
+  if (user) {
+    console.log(`> getting GitHub user keys for ${user}...`);
+    return getGitHubUserKeys(user);
+  } else {
+    console.log(`> getting GitHub deploy keys for ${repo}...`);
+    return getGitHubDeployKeys(repo)
+  }
+};
+
 const messagePayload = _.get(process.argv, 2);
 const signature = _.trim(_.get(process.argv, 3));
 
 const message = JSON.parse(messagePayload);
-const { user, time } = message;
 
-console.log(`> getting GitHub keys for ${user}...`);
-return getGitHubKeys(user)
+console.info('>>> claim to verify:', { message, signature }, '<<<');
+
+return getKeys(message)
   .then(keys => {
     console.log('> verifying message signature against GitHub keys...');
     const goodKey = _.find(keys, key => verify(messagePayload, key, signature));
     if (goodKey) {
-      console.log(`> signature looks good. I trust you are ${user}.`)
-      console.info('>>>', { message, signature }, '<<<');
+      console.log('> signature looks good. I trust you.')
     } else {
-      return Promise.reject(new VError({ name: 'BadSignatureError', info: { user, keys }}));
+      return Promise.reject(new VError({ name: 'BadSignatureError', info: { message, keys }}));
     }
   })
   .catch(err => {

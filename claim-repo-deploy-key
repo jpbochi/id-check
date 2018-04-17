@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+set -eu
+
+REPO=$(git remote -v | grep -E 'origin.*fetch' | perl -n -e'/github\.com[\:\/]([^ .]+)(\.git)?/ && print $1')
+NOW=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+MESSAGE='{"time":"'$NOW'","repo":"'$REPO'"}'
+
+./sign $MESSAGE
